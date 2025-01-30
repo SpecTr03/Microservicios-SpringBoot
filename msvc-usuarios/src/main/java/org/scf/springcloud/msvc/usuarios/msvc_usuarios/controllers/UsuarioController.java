@@ -73,6 +73,11 @@ public class UsuarioController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/usuarios-curso")
+    public ResponseEntity<?> obtenerUsuariosPorCurso(@RequestParam List<Long> ids) {
+        return ResponseEntity.ok(usuarioService.listarPorIds(ids));
+    }
+
     private static ResponseEntity<Map<String, Object>> validar(BindingResult result) {
         Map<String, Object> errores = new HashMap<>();
         result.getFieldErrors().forEach(err -> {

@@ -34,6 +34,25 @@ public class CursoServiceImpl implements CursoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Optional<Curso> porIdConUsuarios(Long id) {
+        Optional<Curso> cursoOptional = cursoRepository.findById(id);
+        if(cursoOptional.isPresent()){
+            Curso curso = cursoOptional.get();
+            if (!curso.getCursoUsuario().isEmpty()){
+                List<Long> ids = curso.getCursoUsuario()
+                        .stream()
+                        .map(CursoUsuario::getUsuarioId)
+                        .toList();
+                List<Usuario> usuarios = clientRest.obtenerUsuariosCurso(ids);
+                curso.setUsuarios(usuarios);
+            }
+            return Optional.of(curso);
+        }
+        return Optional.empty();
+    }
+
+    @Override
     @Transactional
     public Curso guardar(Curso curso) {
         return cursoRepository.save(curso);
@@ -43,6 +62,12 @@ public class CursoServiceImpl implements CursoService {
     @Transactional
     public void eliminar(Long id) {
         cursoRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public void deleteCursoUsuarioByUsuarioId(Long id) {
+        cursoRepository.deleteCursoUsuarioByUsuarioId(id);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.scf.springcloud.msvc.usuarios.msvc_usuarios.services;
 
+import org.scf.springcloud.msvc.usuarios.msvc_usuarios.clients.CursoClienteRest;
 import org.scf.springcloud.msvc.usuarios.msvc_usuarios.models.entiy.Usuario;
 import org.scf.springcloud.msvc.usuarios.msvc_usuarios.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private CursoClienteRest cursoClienteRest;
 
     @Override
     @Transactional(readOnly = true)
@@ -37,10 +41,18 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Transactional
     public void eliminar(Long id) {
         usuarioRepository.deleteById(id);
+        cursoClienteRest.eliminarUsuario(id);
     }
+
 
     @Override
     public Optional<Usuario> buscarPorEmail(String email) {
         return usuarioRepository.findByEmail(email);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Usuario> listarPorIds(Iterable<Long> ids) {
+        return (List<Usuario>) usuarioRepository.findAllById(ids);
     }
 }
